@@ -44,6 +44,6 @@ export class ImgControllers {
 
     const fileUrl = new URL(`/upload/${fileName}`, fullUrl).toString()
 
-    return { fileUrl }
+    return fileUrl 
   }
 }
