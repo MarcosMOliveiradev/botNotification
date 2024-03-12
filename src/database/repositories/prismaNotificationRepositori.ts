@@ -3,6 +3,28 @@ import { NotificationRepository } from "../../application/repositories/notificat
 import { prisma } from "../prisma";
 
 export class PrismaNotificationRepository implements NotificationRepository {
+    async putch(id: string, data: boolean): Promise<void> {
+        await prisma.notification.update({
+            where: {
+                id,
+            },
+            data: {
+                check: data
+            }
+        })
+    }
+    async findAll(): Promise<Notification[]> {
+        const notification = await prisma.notification.findMany({
+            where: {
+                check: false,
+            },
+            orderBy: {
+                createAt: "asc"
+            }
+        })
+
+        return notification
+    }
     async create(notification: Notification): Promise<Notification> {
         const save = await prisma.notification.create({
             data: {
