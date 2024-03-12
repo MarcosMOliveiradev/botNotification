@@ -1,10 +1,11 @@
 version: '3'
 
 services:
-  mongo:
-    image: mongo
+  postgres:
+    image: postgres:14-alpine
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: Abc123
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: abc.123
+      POSTGRES_DB: bot
     ports:
-      - 27017:27017
+      - 3339:5432
