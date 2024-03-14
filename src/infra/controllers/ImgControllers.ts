@@ -1,49 +1,73 @@
-import { randomUUID } from 'node:crypto'
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { resolve, dirname, extname } from 'node:path'
-import { createWriteStream } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { promisify } from 'node:util'
-import { pipeline } from 'node:stream'
+import AWS from 'aws-sdk'
+import { randomBytes } from 'crypto';
 
-const pump = promisify(pipeline)
+const s3 = new AWS.S3({
+  accessKeyId: 'AKIAY6AASZTNC3KECYLL',
+  secretAccessKey: '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',
+  region: 'us-east-1'
+});
 
 export class ImgControllers {
   async upload(request: FastifyRequest, reply: FastifyReply) {
-    const __filename = fileURLToPath(import.meta.url)
-    const __dirname = dirname(__filename)
-    const upload = await request.file({
-      limits: {
-        fileSize: 10_485_760, // 5mb
-      },
-    })
+    const file = await request.file();
 
-    if (!upload) {
-      return reply.status(400).send()
+    if (file === undefined) {
+      throw new Error()
     }
 
-    const mimeTypeRegex = /^(image|video)\/[a-zA-z]+/
-    const isValidFileFormat = mimeTypeRegex.test(upload.mimetype)
+    const random = randomBytes(5)
+    const name = `${random}-${file.filename}`
 
-    if (!isValidFileFormat) {
-      return reply.status(400).send()
+    const params = {
+      Bucket: 'discordimagupload',
+      Key: name,
+      Body: await file.toBuffer()
+    };
+    
+    try {
+      const data = await s3.upload(params).promise();
+      console.log('Upload successful:', data.Location);
+      reply.send({ url: data.Location });
+    } catch (err) {
+      console.error('Upload failed:', err);
+      reply.status(500).send('Upload failed');
     }
+    // const __filename = fileURLToPath(import.meta.url)
+    // const __dirname = dirname(__filename)
+    // const upload = await request.file({
+    //   limits: {
+    //     fileSize: 10_485_760, // 5mb
+    //   },
+    // })
 
-    const fileId = randomUUID()
-    const extension = extname(upload.filename)
+    // if (!upload) {
+    //   return reply.status(400).send()
+    // }
+    
 
-    const fileName = fileId.concat(extension)
+    // const mimeTypeRegex = /^(image|video)\/[a-zA-z]+/
+    // const isValidFileFormat = mimeTypeRegex.test(upload.mimetype)
 
-    const writeSream = createWriteStream(
-      resolve(__dirname, '../../../upload', fileName),
-    )
+    // if (!isValidFileFormat) {
+    //   return reply.status(400).send()
+    // }
 
-    await pump(upload.file, writeSream)
+    // const fileId = randomUUID()
+    // const extension = extname(upload.filename)
 
-    const fullUrl = request.protocol.concat('://').concat(request.hostname)
+    // const fileName = fileId.concat(extension)
 
-    const fileUrl = new URL(`/upload/${fileName}`, fullUrl).toString()
+    // const writeSream = createWriteStream(
+    //   resolve(__dirname, '../../../upload', fileName),
+    // )
 
-    return fileUrl 
+    // await pump(upload.file, writeSream)
+
+    // const fullUrl = request.protocol.concat('://').concat(request.hostname)
+
+    // const fileUrl = new URL(`/upload/${fileName}`, fullUrl).toString()
+
+    // return fileUrl 
   }
 }

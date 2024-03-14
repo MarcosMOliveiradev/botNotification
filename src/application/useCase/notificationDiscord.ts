@@ -26,7 +26,7 @@ export async function conectDiscord() {
 async function getNotification() {
     const getAllNotification = await repositories.findAll()
     try {
-        const channel = client.channels.cache.get('')
+        const channel = client.channels.cache.get('1217845583881175091')
 
         if (channel === undefined) {
             throw new Error('erro de canal')
@@ -37,7 +37,7 @@ async function getNotification() {
             const img = getAllNotification[0].urlImg
             const text = getAllNotification[0].text
             const link = getAllNotification[0].link
-            channel.send(img + text + link)
+            channel.send(`${text}\n${link}\n${img}`)
 
             await repositories.putch(getAllNotification[0].id, true)
             return {
@@ -48,7 +48,7 @@ async function getNotification() {
 
         const text = getAllNotification[0].text
         const link = getAllNotification[0].link
-        channel.send(text + link)
+        channel.send(`${text}\n${link}`)
 
         await repositories.putch(getAllNotification[0].id, true)
 

@@ -11,7 +11,7 @@ app.register(notification, {
     prefix: '/notification',
 })
 
-app.register(conectDiscord)
+// app.register(conectDiscord) TODO: reativar quando a api estiver pronta
 
 app.listen({
     port: 3338,
