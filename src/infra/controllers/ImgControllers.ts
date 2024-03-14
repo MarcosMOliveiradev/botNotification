@@ -3,8 +3,8 @@ import AWS from 'aws-sdk'
 import { randomBytes } from 'crypto';
 
 const s3 = new AWS.S3({
-  accessKeyId: 'AKIAY6AASZTNC3KECYLL',
-  secretAccessKey: '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',
+  accessKeyId: '',
+  secretAccessKey: '',
   region: 'us-east-1'
 });
 
