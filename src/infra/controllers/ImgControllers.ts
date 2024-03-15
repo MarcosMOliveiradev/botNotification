@@ -1,10 +1,10 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import AWS from 'aws-sdk'
-import { randomBytes } from 'crypto';
+import 'dotenv/config'
 
 const s3 = new AWS.S3({
-  accessKeyId: '',
-  secretAccessKey: '',
+  accessKeyId: process.env.Aws_accesskeiid,
+  secretAccessKey: process.env.aws_secretaccesskey,
   region: 'us-east-1'
 });
 
@@ -16,13 +16,20 @@ export class ImgControllers {
       throw new Error()
     }
 
-    const random = randomBytes(5)
+    let random
+    // gera o numero da sala
+    for(var i = 0; i < 6; i++){
+      i == 0 ?  random = Math.floor(Math.random() * 10).toString() :
+      random += Math.floor(Math.random() * 10).toString()
+    }
     const name = `${random}-${file.filename}`
 
     const params = {
       Bucket: 'discordimagupload',
       Key: name,
-      Body: await file.toBuffer()
+      ContentType: file.mimetype,
+      Body: await file.toBuffer(),
+      ACL: "public-read"
     };
     
     try {
@@ -33,41 +40,5 @@ export class ImgControllers {
       console.error('Upload failed:', err);
       reply.status(500).send('Upload failed');
     }
-    // const __filename = fileURLToPath(import.meta.url)
-    // const __dirname = dirname(__filename)
-    // const upload = await request.file({
-    //   limits: {
-    //     fileSize: 10_485_760, // 5mb
-    //   },
-    // })
-
-    // if (!upload) {
-    //   return reply.status(400).send()
-    // }
-    
-
-    // const mimeTypeRegex = /^(image|video)\/[a-zA-z]+/
-    // const isValidFileFormat = mimeTypeRegex.test(upload.mimetype)
-
-    // if (!isValidFileFormat) {
-    //   return reply.status(400).send()
-    // }
-
-    // const fileId = randomUUID()
-    // const extension = extname(upload.filename)
-
-    // const fileName = fileId.concat(extension)
-
-    // const writeSream = createWriteStream(
-    //   resolve(__dirname, '../../../upload', fileName),
-    // )
-
-    // await pump(upload.file, writeSream)
-
-    // const fullUrl = request.protocol.concat('://').concat(request.hostname)
-
-    // const fileUrl = new URL(`/upload/${fileName}`, fullUrl).toString()
-
-    // return fileUrl 
   }
 }

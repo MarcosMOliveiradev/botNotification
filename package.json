@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "tsx watch src/app.ts"
+    "dev": "tsx watch src/app.ts"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
     "fastify": "^4.26.2",
     "fastify-multer": "^2.0.3",
     "mongodb": "^6.4.0",
+    "multer-s3": "^3.0.1",
     "node-cron": "^3.0.3",
     "prisma": "^5.10.2"
   }
