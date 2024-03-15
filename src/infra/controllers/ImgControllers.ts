@@ -1,12 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import AWS from 'aws-sdk'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import 'dotenv/config'
 
-const s3 = new AWS.S3({
-  accessKeyId: process.env.Aws_accesskeiid,
-  secretAccessKey: process.env.aws_secretaccesskey,
-  region: 'us-east-1'
-});
+const s3Client = new S3Client({region: "us-east-1"})
 
 export class ImgControllers {
   async upload(request: FastifyRequest, reply: FastifyReply) {
@@ -17,28 +13,28 @@ export class ImgControllers {
     }
 
     let random
-    // gera o numero da sala
     for(var i = 0; i < 6; i++){
       i == 0 ?  random = Math.floor(Math.random() * 10).toString() :
       random += Math.floor(Math.random() * 10).toString()
     }
-    const name = `${random}-${file.filename}`
+    const fullName = file.filename
+    const newFileName = fullName.replace(/\s/g, '');
+    const name = `${random}-${newFileName}`
 
-    const params = {
+    const params = new PutObjectCommand({
       Bucket: 'discordimagupload',
       Key: name,
-      ContentType: file.mimetype,
+      ContentType: "image/jpeg",
       Body: await file.toBuffer(),
-      ACL: "public-read"
-    };
+      ACL: 'public-read-write'
+    });
     
     try {
-      const data = await s3.upload(params).promise();
-      console.log('Upload successful:', data.Location);
-      reply.send({ url: data.Location });
-    } catch (err) {
-      console.error('Upload failed:', err);
-      reply.status(500).send('Upload failed');
+      await s3Client.send(params);
+      const imageUrl = `https://discordimagupload.s3.amazonaws.com/${name}`
+      reply.send(imageUrl);
+    } catch {
+      console.error('Upload failed:');
     }
   }
 }

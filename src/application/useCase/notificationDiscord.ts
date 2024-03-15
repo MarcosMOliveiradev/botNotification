@@ -1,10 +1,9 @@
 import {Client, GatewayIntentBits} from 'discord.js'
 import { config } from 'dotenv'
 import { PrismaNotificationRepository } from '../../database/repositories/prismaNotificationRepositori';
+import { schedule } from 'node-cron'
 
 const repositories = new PrismaNotificationRepository()
-
-// https://discord.com/oauth2/authorize?client_id=1217150088195997726&permissions=2048&scope=bot
 
 config();
 const client = new Client({
@@ -20,11 +19,12 @@ export async function conectDiscord() {
     client.on('ready', ()=> {
         console.log('bot on')
         getNotification()
+        schedule("* * * * *", getNotification)
     })
 }
-//TODO: Colocar novo id de canal para test e ajusar para a imagem ir corretamente na mensagem mais outras mensagens e liks
 async function getNotification() {
     const getAllNotification = await repositories.findAll()
+
     try {
         const channel = client.channels.cache.get('1217845583881175091')
 
@@ -33,7 +33,6 @@ async function getNotification() {
         }
 
         if(getAllNotification[0].urlImg != null) {
-
             const img = getAllNotification[0].urlImg
             const text = getAllNotification[0].text
             const link = getAllNotification[0].link
@@ -56,8 +55,8 @@ async function getNotification() {
             statu: 201,
             menssage: 'mensagen enviado'
         }
-    } catch(err) {
-        console.log('erro' + err)
+    } catch (err) {
+        console.log('erro ' + err)
     }
 
     

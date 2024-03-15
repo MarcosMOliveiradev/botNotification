@@ -22,7 +22,6 @@ export class PrismaNotificationRepository implements NotificationRepository {
                 createAt: "asc"
             }
         })
-
         return notification
     }
     async create(notification: Notification): Promise<Notification> {
