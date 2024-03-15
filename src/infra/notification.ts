@@ -14,6 +14,8 @@ const notificationUsecase = new createNotificationUseCase(notificationRepository
 const notificationControllers = new CreateNotificationControllers(notificationUsecase)
 const imgControllers = new ImgControllers()
 
+
+// rotas da api
 export async function notification(app: FastifyInstance) {
     app.post('/img', async (request, reply) => {
         return imgControllers.upload(request, reply)

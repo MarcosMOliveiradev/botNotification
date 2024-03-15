@@ -11,6 +11,7 @@ interface ICreateNotification {
 export class createNotificationUseCase {
     constructor(private notificatioRepositri: NotificationRepository) {}
 
+    // Cria no banco a mensagem
     async save(request: ICreateNotification) {
         const { urlImg, link, text, tipo } = request
 

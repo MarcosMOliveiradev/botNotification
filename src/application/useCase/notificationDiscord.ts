@@ -1,11 +1,11 @@
 import {Client, GatewayIntentBits} from 'discord.js'
-import { config } from 'dotenv'
+import 'dotenv/config'
 import { PrismaNotificationRepository } from '../../database/repositories/prismaNotificationRepositori';
 import { schedule } from 'node-cron'
 
 const repositories = new PrismaNotificationRepository()
 
-config();
+// Define informações do client do discord
 const client = new Client({
     intents: [
         GatewayIntentBits.GuildMessages,
@@ -13,15 +13,17 @@ const client = new Client({
     ]
 })
 
+// Função para iniciar o bot no servidor
 export async function conectDiscord() { 
     client.login(process.env.DISCORD_TOKEN)
-    
     client.on('ready', ()=> {
         console.log('bot on')
         getNotification()
-        schedule("* * * * *", getNotification)
+        schedule("0 * * * *", getNotification) // Executa o schedule a cada hora
     })
 }
+
+// Função de buscar as notificações no banco e envialas para o discord
 async function getNotification() {
     const getAllNotification = await repositories.findAll()
 
@@ -38,7 +40,7 @@ async function getNotification() {
             const link = getAllNotification[0].link
             channel.send(`${text}\n${link}\n${img}`)
 
-            await repositories.putch(getAllNotification[0].id, true)
+            await repositories.putch(getAllNotification[0].id, true) // atualiza a mensagem no banco para não ser enviadas novamente
             return {
                 statu: 201,
                 menssage: 'mensagen enviado'
@@ -49,7 +51,7 @@ async function getNotification() {
         const link = getAllNotification[0].link
         channel.send(`${text}\n${link}`)
 
-        await repositories.putch(getAllNotification[0].id, true)
+        await repositories.putch(getAllNotification[0].id, true) // atualiza a mensagem no banco para não ser enviadas novamente
 
         return {
             statu: 201,

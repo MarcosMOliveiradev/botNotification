@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { createNotificationUseCase } from '../../application/useCase/CreateNotification'
 
+// Recebe a requisição vinda do front e valida para enviar para o banco
 export class CreateNotificationControllers {
     constructor(private createNotification: createNotificationUseCase) {}
 
